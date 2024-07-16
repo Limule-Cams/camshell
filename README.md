@@ -16,8 +16,8 @@
 git clone https://github.com/Limule-Cams/camshell.git
 cd camshell
 mkdir build tests
-./tests/N00shell
-make 
+make
+./tests/N00shell 
 ```
 ## Utilisation
 
