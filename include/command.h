@@ -29,5 +29,6 @@ int count_cmd(Command_p cmd);
 void add_file(Command_p cmd, char *file);
 void print_current_history(Command_p cmd);
 int memfree(Command_p cmd);
+void print_content_history_file(char *file);
 
  #endif

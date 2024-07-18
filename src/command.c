@@ -122,15 +122,37 @@ void add_file(Command_p cmd, char *file){
     fic = fopen(file, "a");
     if(fic==NULL) return;
 
-    fprintf(fic, "%s / %d /", cmd->cmd, cmd->nb_arg);
+    while(cmd!=NULL){
 
-    for(int i=0; i<cmd->nb_arg; i++){
+        fprintf(fic, "%s ", cmd->cmd);
 
-        fprintf(fic, "%s", cmd->args[i]);
+        for(int i=0; i<cmd->nb_arg; i++){
+
+            fprintf(fic, "%s ", cmd->args[i]);
+        }
+        fprintf(fic, "\n");
+        cmd = cmd->next;
     }
-    fprintf(fic, "\n");
+
     fclose(fic);
+
 }
+
+void print_content_history_file(char *file){
+
+    FILE *fic;
+    fic = fopen(file, "r");
+    if(fic==NULL) return;
+
+    char cmd[20];
+    while (fgets(cmd, sizeof(cmd), fic) != NULL)
+    {
+        printf("%s", cmd);
+    }
+    fclose(fic);
+
+}
+
 
 
 void print_current_history(Command_p cmd){
@@ -140,15 +162,16 @@ void print_current_history(Command_p cmd){
         return;
     }
     while(cmd!=NULL){
-        printf("%s ", cmd->cmd);
+        printf("%s", cmd->cmd);
         for(int i=0; i<cmd->nb_arg;i++)
-            printf("%s ", cmd->args[i]);
+            printf(" %s ", cmd->args[i]);
 
         cmd = cmd->next;
         
     }
 
 }
+
 
 int memfree(Command_p cmd){
 
