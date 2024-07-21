@@ -40,7 +40,41 @@ void execute_command(Command_p cmd, char *file){
     }else if (strcmp("session_back", cmd->cmd)==0)
     {
         print_content_history_file(file);
+    }else if (strcmp("cd", cmd->cmd)==0)
+    {
+        change_directory(cmd);
     }
+    else if (strcmp("pwd", cmd->cmd)==0)
+    {
+        if(cmd->nb_arg!=0){
+            printf("la fonction s'utilise sans argument\n");
+            exit_cmd(cmd, file);
+        }else{
+            char *dir = print_working_directory();
+            if(dir!=NULL){
+                printf("%s\n", dir);
+                free(dir);
+            }
+        }
+
+    }else if (strcmp("show", cmd->cmd)==0)
+    {
+        if(cmd->nb_arg==2){
+            if(strcmp("-e", cmd->args[0])==0)
+                print_var(cmd->args[1]);
+        }else
+            printf(" nombre d'argument incorrecte\n");
+    }
+    else if (strcmp("all_var", cmd->cmd)==0)
+    {
+        show_env_vars();
+    }else if (strcmp("export", cmd->cmd)==0)
+    {
+        
+    }
+    
+    
+    
 
 } 
 
@@ -50,7 +84,7 @@ void execute_command(Command_p cmd, char *file){
  manage &
 */
 
-int extern_cmd(Command_p cmd){
+int extern_cmd(Command_p cmd, Bool mode_exec){
 
         // check and execute command
     
@@ -75,9 +109,7 @@ int extern_cmd(Command_p cmd){
             int wstatus;
             pid_t w;
 
-            if(0){
-                // mecanisme pour &
-            }else{
+            if(mode_exec){
 
                 do {
 
@@ -99,6 +131,8 @@ int extern_cmd(Command_p cmd){
                         printf("continued\n");
                     }
                 } while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus));
+            }else{
+                printf("[%d]\n", pid);
             }
             
         }
@@ -121,4 +155,71 @@ void exit_cmd(Command_p cmd, char *file){
 
 void screen_clear(){
     printf("\033[H\033[J"); // ANSI code
+}
+
+//using in function extern_cmd for check mode execution processus : simple or with &
+Bool check_execution_mode(char *buff){
+
+    Bool exec_mode = true;
+	if((strcspn(buff, "\n") - strcspn(buff, "&"))==1){
+		buff[strcspn(buff, "&")] = '\0';
+		exec_mode = false;
+    }
+    return exec_mode;
+}
+
+//cd
+int change_directory(Command_p cmd){
+    if(cmd->nb_arg!=1){
+        printf("argument incorrecte\n");
+        return -1;
+    }else{
+        if(access(cmd->args[0], F_OK)==-1){
+            printf("Aucun fichier ou dossier de ce nom\n");
+            return -1;
+        }
+        if(access(cmd->args[0], X_OK)==-1){
+            printf("permission non Permission non accordée\n");
+        }
+
+        if(chdir(cmd->args[0])!=0){
+            printf("impossible d'acceder à ce dossier\n");
+            return -1;
+        }
+    }
+    return 0;
+}
+
+//pwd
+char *print_working_directory(){
+   char *dir = malloc(sizeof(char *)*PATH_MAX);
+   if(dir==NULL){
+    perror("pwd malloc");
+    return NULL;
+   }
+
+    if(getcwd(dir, PATH_MAX)==NULL){
+        printf("verifier votre PATH");
+        free(dir);
+        return NULL;
+    }
+
+    return dir;
+
+}
+
+void print_var(char *var) {
+    char *val=getenv(var);
+    if(val!=NULL)
+        printf("La variable %s a la valeur : %s\n",var,val);
+    else
+        printf("La variable %s n’a pas été assignée\n",var);
+}
+
+void show_env_vars() {
+    char **env = environ;
+    while (*env) {
+        printf("%s\n", *env);
+        env++;
+    }
 }

@@ -16,15 +16,14 @@ int main(){
 
 
 	fgets(buff, LEN_STDIN, stdin);
-
 	buff[strcspn(buff, "\n")] = '\0';
-
-
+	
 	cmd_shell = add_cmd(cmd, buff);
-	if(extern_cmd(cmd_shell)==-1){
-		memfree(cmd_shell);
-		exit(EXIT_FAILURE);
-	}
+	execute_command(cmd_shell, FIL);
+	exit_cmd(cmd_shell, FIL);
+
+
+	
 
 	/*while(1){
 
