@@ -4,8 +4,13 @@
  #include<stdlib.h>
  #include<stdio.h>
  #include<string.h>
+
  #define CMD_MAX 30
  #define FIL ".C_history"
+ #define PATH_MAX 1024
+
+
+ extern char **environ ;
 
 
 typedef enum bool
