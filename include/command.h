@@ -4,7 +4,8 @@
  #include<stdlib.h>
  #include<stdio.h>
  #include<string.h>
- #define CMD_MAX 10
+ #define CMD_MAX 30
+ #define FIL ".C_history"
 
 
 typedef enum bool

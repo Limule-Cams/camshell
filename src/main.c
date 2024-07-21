@@ -6,33 +6,45 @@
 
 
 
+
 int main(){
 
 	char buff[LEN_STDIN];
-	char file[] = ".C_history";
 	Command_elm * cmd = _init_command();
 	Command_elm * cmd_shell = _init_command();
 
-	while(1){
 
-		print_content_history_file(file);
+
+	fgets(buff, LEN_STDIN, stdin);
+
+	buff[strcspn(buff, "\n")] = '\0';
+
+
+	cmd_shell = add_cmd(cmd, buff);
+	if(extern_cmd(cmd_shell)==-1){
+		memfree(cmd_shell);
+		exit(EXIT_FAILURE);
+	}
+
+	/*while(1){
+
 		printf("~");
 		if(fgets(buff, LEN_STDIN, stdin)!=NULL){
 
 			buff[LEN_STDIN - 1] = '\0';
 
-			if(strlen(buff)==0){
+			if(strcmp("\n", buff)==0){
 				exit(EXIT_FAILURE);
 			}
 
-			cmd_shell = add_cmd(cmd, buff);
+
 
 
 		}else{
 			printf("continue to play petty evil");
 			break;
 		}
-	}
+	}*/
 
 	return 0;
 }
