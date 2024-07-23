@@ -19,7 +19,7 @@ typedef enum bool
     true
 }Bool;
 
-
+// structure à refaire pour tenir compte des redirections et pipe
 typedef struct command{
     char **args;
     char *cmd;

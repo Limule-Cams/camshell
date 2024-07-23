@@ -9,7 +9,7 @@
 
 int main(){
 
-	char buff[LEN_STDIN];
+	/*char buff[LEN_STDIN];
 	Command_elm * cmd = _init_command();
 	Command_elm * cmd_shell = _init_command();
 
