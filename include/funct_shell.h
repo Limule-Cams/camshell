@@ -5,6 +5,8 @@
 #include<stdlib.h>
 #include<string.h>
 #include"../include/parser.h"
+#include"../include/vars.h"
+#include"../include/session.h"
 #include<sys/wait.h>
 #include<sys/types.h>
 #include<stdint.h>
