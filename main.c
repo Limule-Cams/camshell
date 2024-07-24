@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "../include/shell.h"
-#include "../include/command.h"
+#include "../include/parser.h"
 
 
 

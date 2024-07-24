@@ -1,4 +1,6 @@
-#include "../include/command.h"
+//parser
+
+#include "../include/parser.h"
 
 Command_p _init_command(){
     return NULL;
@@ -12,6 +14,7 @@ Bool cmd_null(Command_p cmd){
     return false;
 }
 
+//pop back
 void remove_last(Command_p cmd){
 
     Command_elm *elm = cmd;
@@ -55,7 +58,7 @@ Command_p add_cmd(Command_p cmd, char *buff){
 
     Command_elm *elm;
     if((elm = malloc(sizeof(*elm)))==NULL){
-        fprintf(stdout, "erreur d'allocation elm");
+        perror("malloc add_cmd");
         exit(EXIT_FAILURE);
     }
     //parsing with strtok 
@@ -65,18 +68,20 @@ Command_p add_cmd(Command_p cmd, char *buff){
         elm->cmd = strdup(token);
         elm->nb_arg = 0;
 
+        //allocate memory for elm->args
+        //it's a pointer to an array of strings
         elm->args = malloc(sizeof(char *));
         if (elm->args == NULL) {
-            fprintf(stderr, "erreur d'allocation pour args\n");
+            perror("malloc add_cmd");
             free(elm->cmd);
             free(elm);
             exit(EXIT_FAILURE);
         }
-
+        //We allocate memory as many times as there are arguments
         while ((token = strtok(NULL, delim))!=NULL){
                 elm->args = realloc(elm->args, (elm->nb_arg + 1) * sizeof(char *));
             if (elm->args == NULL) {
-                fprintf(stderr, "erreur de réallocation pour args\n");
+                perror("realloc add_cmd");
                 free(elm->cmd);
                 for (int i = 0; i < elm->nb_arg; i++) {
                     free(elm->args[i]);
@@ -85,26 +90,29 @@ Command_p add_cmd(Command_p cmd, char *buff){
                 free(elm);
                 exit(EXIT_FAILURE);
             }
+            // init string
             elm->args[elm->nb_arg] = strdup(token);
             elm->nb_arg++;
         }
     }
     else{
+        //token null error 
         free(elm);
         elm=NULL;
         perror("parse de commande erreur");
         exit(EXIT_FAILURE);
     }
     
-
+    // if not command , elm=head of list
     if(cmd_null(cmd)){
         elm->next = cmd;
         return elm;
     }else{
 
-        // normalement count_cmd != 0
+        //if list=!NULL add elm 
         int count_elm = count_cmd(cmd);
-
+        //check if count_elm=CMD_MAX (max number of orders in our list). if yes delete the last element and add new on the head
+        // if not add new
         if((count_elm==CMD_MAX )){
             remove_last(cmd);     
         }
@@ -115,62 +123,6 @@ Command_p add_cmd(Command_p cmd, char *buff){
     }
 }
 
-
-void add_file(Command_p cmd, char *file){
-
-    FILE *fic;
-    fic = fopen(file, "a");
-    if(fic==NULL) return;
-
-    while(cmd!=NULL){
-
-        fprintf(fic, "%s ", cmd->cmd);
-
-        for(int i=0; i<cmd->nb_arg; i++){
-
-            fprintf(fic, "%s ", cmd->args[i]);
-        }
-        fprintf(fic, "\n");
-        cmd = cmd->next;
-    }
-
-    fclose(fic);
-
-}
-
-void print_content_history_file(char *file){
-
-    FILE *fic;
-    fic = fopen(file, "r");
-    if(fic==NULL) return;
-
-    char cmd[20];
-    while (fgets(cmd, sizeof(cmd), fic) != NULL)
-    {
-        printf("%s", cmd);
-    }
-    fclose(fic);
-
-}
-
-
-
-void print_current_history(Command_p cmd){
-
-    if(cmd==NULL){
-        fprintf(stdout, "\nAucune commande pour la nouvelle session\nVeillez taper la commande back_history");
-        return;
-    }
-    while(cmd!=NULL){
-        printf("%s", cmd->cmd);
-        for(int i=0; i<cmd->nb_arg;i++)
-            printf(" %s ", cmd->args[i]);
-
-        cmd = cmd->next;
-        
-    }
-
-}
 
 
 int memfree(Command_p cmd){
@@ -187,4 +139,39 @@ int memfree(Command_p cmd){
     }
     free(cmd);
     return 0;
+}
+
+
+/*
+this function constructs an array of args for execvp
+if a cmd has no argument this array contains the name of the cmd and NULL
+*/
+char **arg_build(Command_p cmd){
+
+    char **arg = malloc(sizeof(char *)*(cmd->nb_arg + 2));
+    if(arg==NULL){
+        perror("arg_build malloc fail");
+        return NULL;
+    }
+    int i=0;
+    arg[0] = cmd->cmd;
+    if(cmd->nb_arg!=0){
+        for(i=0; i<cmd->nb_arg; i++){
+            arg[i+1]=cmd->args[i];
+        }
+    }
+    arg[cmd->nb_arg + 1] = NULL;
+
+    return arg;
+}
+
+//using in function extern_cmd for check mode execution processus : simple or with &
+Bool check_execution_mode(char *buff){
+
+    Bool exec_mode = true;
+	if((strcspn(buff, "\n") - strcspn(buff, "&"))==1){
+		buff[strcspn(buff, "&")] = '\0';
+		exec_mode = false;
+    }
+    return exec_mode;
 }

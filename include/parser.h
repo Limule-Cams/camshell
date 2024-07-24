@@ -10,11 +10,9 @@
  #define PATH_MAX 1024
 
 
- extern char **environ ;
 
 
-typedef enum bool
-{
+typedef enum {
     false,
     true
 }Bool;
@@ -32,9 +30,8 @@ Bool cmd_null(Command_p cmd);
 void remove_last(Command_p cmd);
 Command_p add_cmd(Command_p cmd, char *buff);
 int count_cmd(Command_p cmd);
-void add_file(Command_p cmd, char *file);
-void print_current_history(Command_p cmd);
 int memfree(Command_p cmd);
-void print_content_history_file(char *file);
+char **arg_build(Command_p cmd);
+Bool check_execution_mode(char *buff);
 
  #endif

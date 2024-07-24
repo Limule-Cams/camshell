@@ -1,30 +1,9 @@
-#include "../include/shell.h"
+//functions building and exec extern command 
+
+#include "../include/funct_shell.h"
 
 
-/*
-this function constructs an array of args for execvp
-if a cmd has no argument this array contains the name of the cmd and NULL
-*/
-char **arg_build(Command_p cmd){
 
-    char **arg = malloc(sizeof(char *)*(cmd->nb_arg + 2));
-    if(arg==NULL){
-        perror("arg_build malloc fail");
-        return NULL;
-    }
-    int i=0;
-    arg[0] = cmd->cmd;
-    if(cmd->nb_arg!=0){
-        for(i=0; i<cmd->nb_arg; i++){
-            arg[i+1]=cmd->args[i];
-        }
-    }
-    arg[cmd->nb_arg + 1] = NULL;
-
-    return arg;
-}
-
-// built-in commands execution"
 
 void execute_command(Command_p cmd, char *file){
 
@@ -80,8 +59,8 @@ void execute_command(Command_p cmd, char *file){
 
 /*
  execute commandExternal commands 
- no pipe management and redirection
- manage &
+ no pipe not redirection
+ but manage &
 */
 
 int extern_cmd(Command_p cmd, Bool mode_exec){
@@ -157,16 +136,6 @@ void screen_clear(){
     printf("\033[H\033[J"); // ANSI code
 }
 
-//using in function extern_cmd for check mode execution processus : simple or with &
-Bool check_execution_mode(char *buff){
-
-    Bool exec_mode = true;
-	if((strcspn(buff, "\n") - strcspn(buff, "&"))==1){
-		buff[strcspn(buff, "&")] = '\0';
-		exec_mode = false;
-    }
-    return exec_mode;
-}
 
 //cd
 int change_directory(Command_p cmd){
@@ -208,18 +177,4 @@ char *print_working_directory(){
 
 }
 
-void print_var(char *var) {
-    char *val=getenv(var);
-    if(val!=NULL)
-        printf("La variable %s a la valeur : %s\n",var,val);
-    else
-        printf("La variable %s n’a pas été assignée\n",var);
-}
 
-void show_env_vars() {
-    char **env = environ;
-    while (*env) {
-        printf("%s\n", *env);
-        env++;
-    }
-}
